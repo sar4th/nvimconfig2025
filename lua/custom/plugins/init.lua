@@ -67,6 +67,31 @@ return {
         },
       },
     }
-  }
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    event = "VeryLazy",
+    opts = {
+      enable_close = true,
+      enable_rename = true,
+      enable_close_on_slash = false,
+      per_filetype = {
+        html = {
+          enable_close = false,
+        },
+      },
+    },
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "^3.0.0", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+        require("nvim-surround").setup({
+            -- Configuration here, or leave empty to use defaults
+        })
+    end
+}
+  
   
 }
