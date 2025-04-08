@@ -303,7 +303,7 @@ require('lazy').setup({
       },
     },
   },
-  
+
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -516,17 +516,17 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', opts = {} },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-  
+
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
-  
+
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
       -- Brief aside: **What is LSP?**
       -- [Your existing LSP explanation remains unchanged...]
-  
+
       -- This function gets run when an LSP attaches to a particular buffer.
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
@@ -536,7 +536,7 @@ require('lazy').setup({
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
-  
+
           -- Existing keymaps (unchanged)
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -547,7 +547,7 @@ require('lazy').setup({
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  
+
           -- Document highlighting autocommands with YAML exclusion
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           -- **Modified Line**: Add filetype check to exclude YAML
@@ -558,13 +558,13 @@ require('lazy').setup({
               group = highlight_augroup,
               callback = vim.lsp.buf.document_highlight,
             })
-  
+
             vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
               buffer = event.buf,
               group = highlight_augroup,
               callback = vim.lsp.buf.clear_references,
             })
-  
+
             vim.api.nvim_create_autocmd('LspDetach', {
               group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
               callback = function(event2)
@@ -573,7 +573,7 @@ require('lazy').setup({
               end,
             })
           end
-  
+
           -- Inlay hints keymap (unchanged)
           if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
             map('<leader>th', function()
@@ -582,50 +582,62 @@ require('lazy').setup({
           end
         end,
       })
-  
+
       -- [Rest of your config remains unchanged...]
       -- Change diagnostic symbols (commented out section remains as is)
       -- LSP capabilities setup
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-  
+
       -- Language servers configuration
       local servers = {
         ts_ls = {},
         lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
+            settings = {
+                Lua = {
+                    completion = {
+                        callSnippet = 'Replace',
+                    },
+                },
             },
-          },
         },
         yamlls = {
-          settings = {
-            yaml = {
-              schemas = {
-                ["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
-                ["http://json.schemastore.org/github-action"] = ".github/action.{yml,yaml}",
-                ["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/**/*.{yml,yaml}",
-                ["http://json.schemastore.org/prettierrc"] = ".prettierrc.{yml,yaml}",
-                ["http://json.schemastore.org/kustomization"] = "kustomization.{yml,yaml}",
-                ["http://json.schemastore.org/chart"] = "Chart.{yml,yaml}",
-                ["http://json.schemastore.org/circleciconfig"] = ".circleci/**/*.{yml,yaml}",
-                ["https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.32.1-standalone-strict/all.json"] = "/*.k8s.yaml",
-              },
+            settings = {
+                yaml = {
+                    schemas = {
+                        ["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
+                        ["http://json.schemastore.org/github-action"] = ".github/action.{yml,yaml}",
+                        ["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/**/*.{yml,yaml}",
+                        ["http://json.schemastore.org/prettierrc"] = ".prettierrc.{yml,yaml}",
+                        ["http://json.schemastore.org/kustomization"] = "kustomization.{yml,yaml}",
+                        ["http://json.schemastore.org/chart"] = "Chart.{yml,yaml}",
+                        ["http://json.schemastore.org/circleciconfig"] = ".circleci/**/*.{yml,yaml}",
+                        ["https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.32.1-standalone-strict/all.json"] = "/*.k8s.yaml",
+                    },
+                },
             },
-          },
         },
-      }
-  
+        gopls = {
+            settings = {
+                gopls = {
+                    analyses = {
+                        unusedparams = true,
+                        unusedwrite = true,
+                    },
+                    staticcheck = true,
+                    gofumpt = true, -- Use gofumpt for better formatting
+                },
+            },
+        },
+    }
+
       -- Mason tool installer setup
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-  
+
       -- Mason-lspconfig setup
       require('mason-lspconfig').setup {
         handlers = {
